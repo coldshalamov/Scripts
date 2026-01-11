@@ -1,0 +1,65 @@
+agents:
+  - name: gemini
+    command: gemini
+    args:
+      - --yolo
+    type: gemini
+    instructionFile: GEMINI.md
+    role: Planner & Researcher
+  - name: claude
+    command: claude
+    args:
+      - --yolo
+    type: claude
+    instructionFile: CLAUDE.md
+    role: Main Developer
+  - name: codex
+    command: codex
+    args:
+      - --yolo
+    type: codex
+    instructionFile: AGENTS.md
+    role: Architect & Builder
+  - name: jules
+    command: jules
+    args:
+      - --yolo
+    type: jules
+    role: Automation Assistant
+  - name: cline
+    command: wsl
+    args:
+      - cline
+    type: cline
+    instructionFile: .clinerules
+    role: QA & Reviewer
+  - name: echo
+    command: cmd
+    args:
+      - /c
+      - echo
+    type: generic
+    role: System Diagnostic
+  - name: Kilo Code
+    command: kilo
+    args:
+      - --yolo
+    type: generic
+    instructionFile: ""
+    role: ""
+termMapping:
+  term1: claude
+  term2: codex
+  term3: gemini
+  term4: Kilo Code
+workspaceDir: C:\Users\User\Documents\GitHub\Scripts
+workspaceInstructions: >-
+  YOU ARE A MEMBER OF A TEAM OF CODING AGENTS. COORDINATE VIA 'edit.log'.
+
+  # AGENT COORDINATION RULES 1. Append single lines to 'edit.log'. 2. Format:
+  EDIT-OPEN | <name> | <file> | <reason> 3. Format: EDIT-CLOSE | <name> | <file>
+  | <outcome> 4. NEVER prune the log manually.
+promptLibrary:
+  blocks: []
+  prompts: []
+  chains: []

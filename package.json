@@ -1,0 +1,76 @@
+{
+    "name": "chronos-cli",
+    "version": "1.0.0",
+    "description": "Autonomous Agent Orchestrator",
+    "main": "desktop-main.js",
+    "bin": {
+        "chronos": "./dist/cli.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/cli.js",
+        "ui": "npm run build && node dist/server.js & cd dashboard && npm run dev",
+        "nuke-port": "for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :3000') do taskkill /F /PID %a",
+        "electron:dev": "npm run build && set NODE_ENV=development&& npx electron desktop-main.js",
+        "electron:build": "npm run build && cd dashboard && npm run build && cd .. && npx electron-builder",
+        "app": "npm run electron:dev",
+        "mobile": "node start-mobile.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "build": {
+        "appId": "com.chronos.orchestrator",
+        "productName": "Chronos",
+        "directories": {
+            "output": "release"
+        },
+        "files": [
+            "dist/**/*",
+            "dashboard/dist/**/*",
+            "dashboard/public/**/*",
+            "electron.js",
+            "package.json"
+        ],
+        "win": {
+            "target": "nsis",
+            "icon": "dashboard/public/assets/chronos_logo.png"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true
+        }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^22.10.5",
+        "boxen": "^5.1.2",
+        "chalk": "^4.1.2",
+        "cli-table3": "^0.6.5",
+        "commander": "^13.0.0",
+        "concurrently": "^9.2.1",
+        "cors": "^2.8.5",
+        "date-fns": "^4.1.0",
+        "dotenv": "^16.4.7",
+        "electron": "^39.2.7",
+        "electron-builder": "^26.4.0",
+        "execa": "^5.1.1",
+        "express": "^5.2.1",
+        "log-symbols": "^4.1.0",
+        "node-pty": "^1.1.0",
+        "socket.io": "^4.8.3",
+        "socket.io-client": "^4.8.3",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3",
+        "wait-on": "^9.0.3",
+        "xterm": "^5.3.0",
+        "xterm-addon-fit": "^0.8.0",
+        "yaml": "^2.7.0"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6"
+    }
+}

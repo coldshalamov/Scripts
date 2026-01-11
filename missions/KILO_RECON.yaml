@@ -1,0 +1,14 @@
+name: "Kilo Recon Mission"
+description: "A specialized mission designed to verify the Kilo Code tactical unit."
+stages:
+  - id: "kilo-1-init"
+    name: "System Handshake"
+    agent: "Kilo Code"
+    prompt: "Acknowledge presence. Run --help to confirm arguments are correctly loaded."
+  
+  - id: "kilo-2-scan"
+    name: "Logical Scan"
+    agent: "Kilo Code"
+    prompt: "Verify workspace integrity and report any anomalies."
+    dependsOn: ["kilo-1-init"]
+    contextFrom: ["kilo-1-init"]

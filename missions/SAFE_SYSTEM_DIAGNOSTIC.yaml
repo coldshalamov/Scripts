@@ -1,0 +1,14 @@
+name: "SAFE: System Diagnostic"
+description: "A safe, local test that checks if the Orchestrator can run commands. DOES NOT call any AI models."
+stages:
+  - id: "check-1-ping"
+    name: "Ping Test"
+    agent: "echo"
+    prompt: "[SYSTEM] Diagnostic Ping... 200 OK. The Orchestrator is online."
+    
+  - id: "check-2-context"
+    name: "Context Pipe Test"
+    agent: "echo"
+    prompt: "[SYSTEM] Verifying Context Piping... Pipe is clear."
+    dependsOn: ["check-1-ping"]
+    contextFrom: ["check-1-ping"]

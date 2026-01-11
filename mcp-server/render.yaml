@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: chronos-mcp-server
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CHRONOS_API_URL
+        sync: false
+        # Set this in Render dashboard to your local Chronos instance
+        # You'll need to expose your local server via ngrok or similar
+    healthCheckPath: /health
