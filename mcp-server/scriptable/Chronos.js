@@ -1,8 +1,6 @@
-// @ts-nocheck
 // Chronos Mobile - iOS Scriptable App
 // A mobile interface for controlling your Chronos agents
-// UPDATE THE URL BELOW TO YOUR RENDER/NGROK URL
-const MCP_URL = "https://your-mcp-server.onrender.com";
+const MCP_URL = "https://chronosmcp.onrender.com";
 
 // ============================================
 // Configuration
@@ -28,61 +26,59 @@ const CONFIG = {
 
 class ChronosAPI {
     constructor(baseUrl) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+    }
+
+    async _request(endpoint, body) {
+        try {
+            const req = new Request(`${this.baseUrl}${endpoint}`);
+            req.method = "POST";
+            req.headers = { "Content-Type": "application/json" };
+            req.body = JSON.stringify(body);
+            req.timeoutInterval = 60; // Increased for Render cold starts
+
+            // Handle potential HTML response (404/500)
+            let res;
+            try {
+                res = await req.loadJSON();
+            } catch (e) {
+                // Try to read as text to see if it's HTML
+                const text = await req.loadString();
+                if (text.includes("<!DOCTYPE html>")) {
+                    throw new Error("Server returned HTML instead of JSON. Check your MCP_URL.");
+                }
+                throw e;
+            }
+
+            if (!res) throw new Error("Empty response from server");
+            if (res.error) throw new Error(res.error);
+            if (!res.result && !endpoint.includes("delegate")) {
+                // delegate might return simple success
+                if (res.success) return res;
+                throw new Error("Missing result in response");
+            }
+            return res.result || res;
+        } catch (e) {
+            throw new Error(`API Error (${endpoint}): ${e.message}`);
+        }
     }
 
     async listAgents() {
-        try {
-            const req = new Request(`${this.baseUrl}/mcp/execute-tool`);
-            req.method = "POST";
-            req.headers = { "Content-Type": "application/json" };
-            req.body = JSON.stringify({ name: "list_agents", arguments: {} });
-            const res = await req.loadJSON();
-            if (!res || !res.result) {
-                throw new Error(res?.error || "Invalid response from server (missing result)");
-            }
-            return res.result;
-        } catch (e) {
-            throw new Error(`API Error: ${e.message}`);
-        }
+        return this._request("/mcp/execute-tool", { name: "list_agents", arguments: {} });
     }
 
     async getAgentContext(agentName) {
-        try {
-            const req = new Request(`${this.baseUrl}/mcp/execute-tool`);
-            req.method = "POST";
-            req.headers = { "Content-Type": "application/json" };
-            req.body = JSON.stringify({ name: "get_agent_context", arguments: { agentName } });
-            const res = await req.loadJSON();
-            if (!res || !res.result) {
-                throw new Error(res?.error || "Invalid response from server (missing result)");
-            }
-            return res.result;
-        } catch (e) {
-            throw new Error(`Context Error: ${e.message}`);
-        }
+        return this._request("/mcp/execute-tool", { name: "get_agent_context", arguments: { agentName } });
     }
 
     async delegateTask(agentName, task) {
-        try {
-            const req = new Request(`${this.baseUrl}/mcp/execute-tool`);
-            req.method = "POST";
-            req.headers = { "Content-Type": "application/json" };
-            req.body = JSON.stringify({ name: `delegate_to_${agentName}`, arguments: { task } });
-            const res = await req.loadJSON();
-            if (!res || !res.result) {
-                throw new Error(res?.error || "Invalid response from server (missing result)");
-            }
-            return res.result;
-        } catch (e) {
-            throw new Error(`Delegation Error: ${e.message}`);
-        }
+        return this._request("/mcp/execute-tool", { name: `delegate_to_${agentName}`, arguments: { task } });
     }
 
     async healthCheck() {
         try {
             const req = new Request(`${this.baseUrl}/health`);
-            req.timeoutInterval = 5; // Fast timeout
+            req.timeoutInterval = 60; // Increased to 60s for Render cold starts
             const res = await req.loadJSON();
             return res && res.status === "ok";
         } catch (e) {
@@ -103,7 +99,7 @@ async function showAgentList() {
     if (!isOnline) {
         const alert = new Alert();
         alert.title = "Connection Failed";
-        alert.message = `Cannot reach Chronos MCP server.\n\nURL: ${CONFIG.mcpUrl}\n\nMake sure your PC and ngrok/Render are active.`;
+        alert.message = `Cannot reach Chronos MCP server.\n\nURL: ${CONFIG.mcpUrl}\n\n1. Check if Render/ngrok is running.\n2. Verify the URL in the script.\n3. Render free tier takes ~30s to wake up.`;
         alert.addAction("Retry");
         alert.addCancelAction("Cancel");
         if (await alert.presentAlert() === 0) {
@@ -294,11 +290,16 @@ async function createWidget() {
 // Execution
 // ============================================
 
-if (config.runsInWidget) {
-    const widget = await createWidget();
-    Script.setWidget(widget);
-} else {
-    await showAgentList();
-}
-
-Script.complete();
+(async () => {
+    try {
+        if (config.runsInWidget) {
+            const widget = await createWidget();
+            Script.setWidget(widget);
+        } else {
+            await showAgentList();
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    Script.complete();
+})();
