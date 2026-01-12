@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Chronos Mobile - iOS Scriptable App
 // A mobile interface for controlling your Chronos agents
 // UPDATE THE URL BELOW TO YOUR RENDER/NGROK URL
