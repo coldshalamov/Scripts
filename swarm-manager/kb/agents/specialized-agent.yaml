@@ -1,0 +1,8 @@
+id: specialized-agent
+name: Specialized Researcher
+type: llm
+capabilities:
+  - research
+  - analysis
+instructions: Specialized instructions for research tasks
+created: 2026-01-17T14:18:04.266Z

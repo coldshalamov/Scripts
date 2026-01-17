@@ -1,0 +1,165 @@
+version: 1.0.0
+
+manager:
+  id: "swarm-manager"
+  type: "orchestrator"
+  capabilities: ["orchestrate", "coordinate", "monitor"]
+
+  # Manager behavior
+  autoOrchestrate: false
+  pollInterval: 30000  # 30 seconds between checks
+  maxConcurrent: 1     # Sequential execution (can increase)
+
+  # Task configuration
+  defaultPriority: "medium"
+  researchPriority: "high"
+  executionTimeoutMultiplier: 1.0  # percentage of estimate before timeout
+
+agents:
+  # Map agent types to Chronos agents
+  researcher: claude
+  planner: claude
+  executor: claude
+  reviewer: claude
+  debugger: claude
+
+  # Agent-specific preferences
+  claude:
+    type: "llm"
+    cli: "claude-cli"
+    capabilities: ["research", "plan", "execute", "review", "debug"]
+    preferred_phases: ["research", "planning", "execute", "review"]
+
+  gemini:
+    type: "llm"
+    cli: "gemini-cli"
+    capabilities: ["research", "execute"]
+    preferred_phases: ["research", "execute"]
+
+  codex:
+    type: "llm"
+    cli: "codex-cli"
+    capabilities: ["execute", "code"]
+    preferred_phases: ["execute"]
+
+  jules:
+    type: "llm"
+    cli: "jules-cli"
+    capabilities: ["execute", "fix"]
+    preferred_phases: ["execute"]
+
+knowledge_base:
+  notes_dir: "./kb/notes"
+  projects_dir: "./kb/projects"
+  agents_dir: "./kb/agents"
+  logs_dir: "./kb/logs"
+
+  # Note parsing
+  parse_frontmatter: true
+  auto_tag_detection: true
+  max_note_history: 1000
+
+sandbox:
+  base_dir: "./sandboxes"
+  workspace_subdir: "workspace"
+  output_subdir: "output"
+  logs_subdir: "logs"
+  tmp_subdir: "tmp"
+
+  # Sandbox cleanup
+  cleanup_on_complete: false  # Keep for review
+  cleanup_on_failure: false
+  cleanup_after_hours: 24
+
+task_decomposition:
+  # Phase configuration
+  phases:
+    research:
+      enabled: true
+      priority_boost: "high"
+      triggers: ["investigate", "research", "analyze", "explore"]
+
+    planning:
+      enabled: true
+      priority_boost: "medium"
+      triggers: ["plan", "design", "architecture"]
+
+    execution:
+      enabled: true
+      priority_boost: "medium"
+      triggers: ["create", "build", "implement", "fix", "add"]
+
+    review:
+      enabled: true
+      priority_boost: "high"
+      always_include: true
+
+  # Subtask generation
+  execution_subtasks:
+    feature: ["Implement core functionality", "Add tests"]
+    bug: ["Diagnose issue", "Implement fix"]
+    general: ["Implementation"]
+
+verification:
+  # Default checklists per phase
+  research:
+    - "Identified requirements"
+    - "Found relevant patterns"
+    - "Assessed feasibility"
+
+  planning:
+    - "Created detailed plan"
+    - "Breakdown into subtasks"
+    - "Identified dependencies"
+
+  execution:
+    - "Implementation complete"
+    - "Tested functionality"
+    - "No obvious errors"
+
+  review:
+    - "Verified against requirements"
+    - "Tested edge cases"
+    - "Documentation complete"
+    - "Production ready"
+
+api_server:
+  enabled: true
+  port: 8081
+  host: "0.0.0.0"
+
+  # Socket.io
+  socket_enabled: true
+  broadcast_interval: 5000  # milliseconds
+
+  # CORS
+  cors_origins: "*"
+
+dashboard:
+  integration_enabled: true
+  real_time_updates: true
+  max_tasks_display: 20
+
+# Chronos Integration
+chronos:
+  pt_server_port: 3000
+  mcp_gateway_port: 8080
+  manager_api_port: 8081
+
+  # Path to Chronos main script
+  chronos_path: "./Chronos.js"
+
+  # Auto-start manager in Chronos
+  auto_start: true
+
+  # Command to launch manager from Chronos
+  launch_command: "node swarm-manager/api-server.js"
+
+logging:
+  level: "info"  # debug, info, warn, error
+  file: "./kb/logs/manager.log"
+  console: true
+
+  # Log rotation
+  max_file_size: "10M"
+  max_files: 5

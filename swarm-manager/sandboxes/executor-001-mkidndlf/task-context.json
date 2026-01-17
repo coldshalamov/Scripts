@@ -1,0 +1,32 @@
+{
+  "task": {
+    "id": "TEST-001",
+    "type": "execution",
+    "phase": "execute",
+    "title": "Test Task",
+    "description": "Test description",
+    "parentNoteId": "test-note",
+    "projectId": "test",
+    "priority": "medium",
+    "estimatedDuration": 10
+  },
+  "sandbox": {
+    "id": "executor-001-mkidndlf",
+    "workspace": "D:\\GitHub\\Scripts\\swarm-manager\\sandboxes\\executor-001-mkidndlf\\workspace",
+    "output": "D:\\GitHub\\Scripts\\swarm-manager\\sandboxes\\executor-001-mkidndlf\\output",
+    "tmp": "D:\\GitHub\\Scripts\\swarm-manager\\sandboxes\\executor-001-mkidndlf\\tmp"
+  },
+  "verification": {
+    "checklist": [
+      "Item 1",
+      "Item 2"
+    ]
+  },
+  "rules": {
+    "workspace": "Working directory for this task",
+    "output": "Save all outputs here",
+    "logs": "All logs go here",
+    "max-duration": "10 minutes"
+  },
+  "created": "2026-01-17T14:02:53.718Z"
+}
